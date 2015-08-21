@@ -1,9 +1,21 @@
 from django.db import models
 
-class Perfil(object):
+class Perfil(models.Model):
 
-    def __init__(self, nome='', email='', telefone='', nome_empresa=''):
-        self.nome = nome
-        self.email = email
-        self.telefone = telefone
-        self.nome_empresa = nome_empresa
+    nome = models.CharField(max_length=255, null=False)
+    email = models.CharField(max_length=255, null=False)
+    telefone = models.CharField(max_length=15, null=False)
+    nome_empresa = models.CharField(max_length=255, null=False)
+
+    @staticmethod
+    def convidar(request, perfil_convidado):
+        Convite(solicitante=Perfil.get_perfil_logado(request), convidado=perfil_convidado).save()
+
+    @staticmethod
+    def get_perfil_logado(request):
+        return Perfil.objects.get(id=2)
+
+class Convite(models.Model):
+
+    solicitante = models.ForeignKey(Perfil, related_name='convites_feitos')
+    convidado = models.ForeignKey(Perfil, related_name='convites_recebidos')
